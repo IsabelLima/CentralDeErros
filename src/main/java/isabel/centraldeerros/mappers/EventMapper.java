@@ -11,7 +11,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
-    //@Mapping(target = "log", ignore = true)
     EventDTO map(Event event);
     List<EventDTO> map(List<Event> events);
 }
