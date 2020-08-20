@@ -4,19 +4,17 @@ import isabel.centraldeerros.dto.EventDTO;
 import isabel.centraldeerros.entity.Event;
 import isabel.centraldeerros.mappers.EventMapper;
 import isabel.centraldeerros.service.impl.EventService;
-import org.apache.tomcat.jni.Local;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.websocket.server.PathParam;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 
 @RestController
@@ -40,15 +38,17 @@ public class EventController {
     }
 
     @GetMapping
-    public Iterable<EventDTO> findAll(@PathParam("level") Optional<String> level,
-                                      @PathParam("description") Optional<String> description,
-                                      @PathParam("log") Optional<String> log,
-                                      @PathParam("source")  Optional <String> source,
-                                      @PathParam("date")
-                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Optional<LocalDateTime> date,
-                                      @PathParam("quantity") Optional<Integer> quantity,
-                                      Pageable pageable) {
-
-        return  mapper.map(this.eventService.findAll(pageable));
+    public Iterable<EventDTO> findAll(
+            @And({
+                    @Spec(path = "level", spec = Equal.class),
+                    @Spec(path = "description", spec = Equal.class),
+                    @Spec(path = "log", spec = Equal.class),
+                    @Spec(path = "source", spec = Equal.class),
+                    @Spec(path = "date", spec = Equal.class),
+                    @Spec(path = "quantity", spec = Equal.class)
+            }) Specification<Event> eventSpecification,
+            Pageable pageable
+    ) {
+        return mapper.map(this.eventService.findAll(eventSpecification, pageable));
     }
 }
